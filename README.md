@@ -1,84 +1,52 @@
-# flutter-event-planner
+# Event Planner — Flutter
 
-Bu proje, **Mobil Programlama** dersi **6. Ödev** kapsamında geliştirilmiş, kullanıcıların etkinlik oluşturup yönetebileceği, konum ve görsel destekli bir **Flutter** uygulamasıdır. Veri saklama işlemleri için yerel veritabanı (SQLite) kullanılmıştır.
+A cross-platform mobile app for creating and managing personal events, with user accounts and offline storage in a local **SQLite** database. Built for the *Mobile Programming* course at Konya Technical University.
 
-## 🚀 Özellikler
+## Features
 
-Uygulama aşağıdaki temel fonksiyonları içermektedir:
+- **User accounts:** register, log in, update username and password, log out
+- **Per-user events:** each user only sees their own events
+- **Create events** with a title, description, image (from a URL, with live preview), date and location
+- **Event list** on the home screen, persisted across app restarts
+- **Event detail page** opened with a **Hero animation** from the list image
+- **Delete events** with a confirmation dialog
 
-### 1. Kullanıcı İşlemleri (Authentication)
-* **Kayıt Ol:** Kullanıcı adı ve parola ile yeni kayıt oluşturma. (Veriler SQLite `users` tablosuna kaydedilir.)
-* **Giriş Yap:** Kayıtlı kullanıcı bilgileriyle sisteme giriş.
-* **Profil Güncelleme:** Giriş yapmış kullanıcının kullanıcı adı ve şifresini güncelleyebilmesi.
-* **Çıkış:** Oturumu sonlandırma ve giriş ekranına dönüş.
+## Tech Stack
 
-### 2. Etkinlik Yönetimi
-* **Etkinlik Ekleme:**
-    * Etkinlik Adı ve İçeriği (Metin girişi)
-    * Etkinlik Görseli (Galeriden veya Kameradan seçim)
-    * Tarih Seçimi (Date Time Picker)
-    * Konum Seçimi (Google Maps üzerinden işaretleme)
-* **Listeleme:** Eklenen etkinliklerin Ana Sayfada listelenmesi. Uygulama kapatılıp açılsa dahi veriler `sqflite` sayesinde korunur.
-* **Detay Görüntüleme & Animasyon:** Listeden bir etkinliğin görseline tıklandığında, **özel bir animasyon** (Hero veya PageRouteBuilder) ile detay sayfasına geçiş yapılır.
+| | |
+|---|---|
+| Framework | Flutter (Dart 3), Material 3 |
+| Storage | SQLite via `sqflite` (singleton `DatabaseHelper`, parameterized queries) |
+| Other packages | `path`, `intl` |
 
-## 🛠️ Kullanılan Teknolojiler ve Paketler
+## Database Schema
 
-* **Flutter & Dart**
-* **sqflite:** Yerel veritabanı yönetimi (CRUD işlemleri için).
-* **path:** Veritabanı dosya yollarını yönetmek için.
-* **google_maps_flutter:** Harita entegrasyonu ve konum seçimi için.
-* **image_picker:** Cihaz galerisinden görsel seçmek için.
-* **intl:** Tarih formatlama işlemleri için.
+```text
+users  (id, username, password)
+events (id, userId, title, content, imagePath, eventDate, location)
+```
 
-## 📸 Ekran Görüntüleri
+## Getting Started
 
-| Giriş Ekranı | Anasayfa | Etkinlik Ekleme | Detay & Harita |
-| :---: | :---: | :---: | :---: |
-| ![Giriş](gorseller/giris_screenshot.png) | ![Anasayfa](gorseller/home_screenshot.png) | ![Ekleme](gorseller/add_event_screenshot.png) | ![Detay](gorseller/detail_screenshot.png) |
+```bash
+git clone https://github.com/ardactin/flutter-event-planner.git
+cd flutter-event-planner
+flutter pub get
+flutter run
+```
 
-*(Not: Ekran görüntülerinizi projenizin içine bir klasöre atıp buradaki yolları güncelleyiniz.)*
+Run the tests with `flutter test`.
 
-## 📂 Veritabanı Yapısı
+## Project Structure
 
-Uygulama `app_database.db` adında bir SQLite veritabanı kullanır ve iki ana tablo içerir:
+```text
+lib/main.dart        # App, DatabaseHelper and all screens
+test/widget_test.dart
+android/ ios/ web/ windows/ linux/ macos/   # Platform runners
+```
 
-1.  **users**
-    * `id` (INTEGER, Primary Key)
-    * `username` (TEXT)
-    * `password` (TEXT)
+## Known Limitations & Next Steps
 
-2.  **events**
-    * `id` (INTEGER, Primary Key)
-    * `title` (TEXT)
-    * `description` (TEXT)
-    * `imagePath` (TEXT)
-    * `date` (TEXT)
-    * `latitude` (REAL)
-    * `longitude` (REAL)
-
-## ⚙️ Kurulum ve Çalıştırma
-
-Projeyi kendi bilgisayarınızda çalıştırmak için şu adımları izleyin:
-
-1.  Projeyi klonlayın:
-    ```bash
-    git clone [https://github.com/KULLANICI_ADINIZ/REPO_ADINIZ.git](https://github.com/KULLANICI_ADINIZ/REPO_ADINIZ.git)
-    ```
-2.  Proje dizinine gidin ve paketleri yükleyin:
-    ```bash
-    cd proje_klasoru
-    flutter pub get
-    ```
-3.  **ÖNEMLİ:** Google Maps'in çalışması için `android/app/src/main/AndroidManifest.xml` ve `ios/Runner/AppDelegate.swift` dosyalarına kendi **Google Maps API Key**'inizi eklemeniz gerekmektedir.
-4.  Uygulamayı başlatın:
-    ```bash
-    flutter run
-    ```
-
-## 📝 Notlar
-
-* Etkinlik görselleri cihazın yerel depolama alanına kaydedilen dosya yolları (path) üzerinden yönetilmektedir.
-* Detay sayfasına geçiş animasyonu "Ödev 4" gereksinimlerine uygun olarak kurgulanmıştır.
-
----
-**Geliştirici:** [Adınız Soyadınız]
+- **Location picker is simulated:** the map dialog fills in sample coordinates; integrating `google_maps_flutter` is the next step.
+- **Passwords are stored in plain text** in the local database; they should be hashed (e.g. with `crypto`) before any real use.
+- All screens live in `main.dart`; splitting them into `screens/`, `models/` and `data/` folders would improve maintainability.
